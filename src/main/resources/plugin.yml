@@ -1,0 +1,28 @@
+# plugin.yml
+
+# Nuevo nombre del plugin
+name: AdvancedMobAI
+
+version: 1.0.0 # O la versión que corresponda
+
+# Actualiza la ruta si renombraste la clase principal
+main: com.krystalfox.aimobs.AdvancedMobAI
+
+# Asegúrate de que la api-version sea la correcta para tu servidor
+api-version: '1.20' # <-- ¡AJUSTA ESTO A TU VERSIÓN!
+
+author: KrystalFox
+description: Mejora la inteligencia artificial de varios mobs hostiles en Minecraft.
+
+commands:
+  # Definimos el comando principal 'am'
+  am:
+    description: Gestiona el plugin AdvancedMobAI.
+    usage: /<command> reload # Indicamos cómo se usa
+    aliases: [advancedmobai] # Un alias más largo opcional
+
+permissions:
+  # Permiso específico para usar el subcomando 'reload'
+  advancedmobai.reload:
+    description: Permite recargar la configuración de AdvancedMobAI.
+    default: op # Por defecto, solo los OPs tienen este permiso
