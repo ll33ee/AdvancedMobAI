@@ -45,6 +45,8 @@ creeper:
     min_vertical_distance: 2.0   # Player must be at least this high above the creeper (Y difference).
     max_vertical_distance: 5.0   # Player must not be higher than this above the creeper (Y difference).
 
+  creeper_explosions:
+    friendly_fire: false         # if false, creepers explosion don't damage other creepers and hostile mobs
 
 # === Enderman Settings ===
 enderman:
@@ -301,7 +303,63 @@ enderman:
       - 'TINTED_GLASS'
       # --- Other ---
       - 'SPAWNER' # Mob Spawner
+spider_ai:
+  # --- Web Shot AI ---
+  # Allows Spiders to shoot snowballs that create cobwebs on impact with a player.
+  web_shot:
+    enabled: true               # true to enable, false to disable this feature.
+    range: 15.0                 # Maximum distance (blocks) the spider will attempt to shoot a player.
+    cooldown_seconds: 15         # Cooldown in seconds before the SAME spider can shoot again.
+    check_interval_ticks: 40    # Interval (in ticks) at which spiders check for targets. (20 ticks = 1 second).
+    web_duration_seconds: 5     # Duration in seconds the cobweb will persist after creation.
+    # Potion effect applied to the player when captured by the web shot.
+    # Set to 'false' to disable any potion effect.
+    apply_effect_on_capture: true
+    effect_type: 'POISON'       # Type of potion effect (e.g., POISON, SLOWNESS, BLINDNESS). Must be a valid PotionEffectType.
+    effect_duration_seconds: 6  # Duration of the potion effect in seconds.
+    effect_amplifier: 0         # Amplifier of the potion effect (0 for level I, 1 for level II, etc.).
 
-# === Future sections for other mobs (Spiders, Skeletons, etc.) would go here ===
+    # Particle effects (optional)
+    particles_on_shot: true     # If true, particles will show when a spider shoots.
+    particle_type_on_shot: 'SPIT' # Type of particle to spawn when shooting (e.g., SPIT, CRIT, SMOKE).
+    particles_on_impact: true   # If true, particles will show on impact.
+    particle_type_on_impact: 'BLOCK_CRACK' # Type of particle to spawn on impact (e.g., BLOCK_CRACK, EXPLOSION_LARGE).
+witch_ai:
+  # --- Supportive Witch AI ---
+  # Allows witches to throw beneficial potions to nearby hostile mobs.
+  supportive_ai:
+    enabled: true
+    check_interval_ticks: 40
+    max_player_distance: 25.0 #This prevents the witch from casting the ability if there are no players within this range, helps with optimization, warning, MUST be larger than min_player_distance
+    min_player_distance: 8.0 #This prevents players from receiving beneficial effects, as the witch will not cast beneficial potions if the player is too close.
+    ally_search_radius: 6.0 #Within this range the witch will look for allied entities to throw beneficial potions at.
+    cooldown_seconds: 15
+    effects:
+      - type: 'SPEED'
+        amplifier: 1
+        duration_seconds: 30
+        chance: 0.2
+      - type: 'RESISTANCE'
+        amplifier: 0
+        duration_seconds: 25
+        chance: 0.3
+      - type: 'STRENGTH'
+        amplifier: 0
+        duration_seconds: 30
+        chance: 0.3
+      - type: 'INVISIBILITY'
+        amplifier: 0
+        duration_seconds: 10
+        chance: 0.2
+    # Mob types that witches can target with beneficial potions
+    target_mobs:
+      - 'ZOMBIE'
+      - 'SKELETON'
+      - 'CREEPER'
+      - 'SPIDER'
+      - 'CAVE_SPIDER'
+# === Future sections for other mobs would go here ===
 
 # End of config.yml file
+
+#thanks for using my plugin! <3 and sorry if my english is bad haha

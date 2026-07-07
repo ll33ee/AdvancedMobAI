@@ -1,6 +1,5 @@
 package com.krystalfox.aimobs;
 
-// ... (imports como antes) ...
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -8,7 +7,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
-// Eliminamos la importación de Pathfinder si ya no se usa en otro lugar
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -16,16 +14,13 @@ import java.util.*;
 
 public class EndermanAIUpdater extends BukkitRunnable {
 
-    // ... (variables miembro como antes: plugin, maxCheckDistanceSq, etc.) ...
     private final AdvancedMobAI plugin;
     private final double maxCheckDistanceSq;
     private final long cooldownTimeMs;
     private final Set<Material> pickupableMaterials;
     private final Map<UUID, Long> endermanCooldown = new HashMap<>();
 
-
     public EndermanAIUpdater(AdvancedMobAI plugin) {
-        // ... (constructor como antes, cargando config) ...
         this.plugin = plugin;
         org.bukkit.configuration.file.FileConfiguration config = plugin.getConfig();
         double maxDist = config.getDouble("enderman.dismantler_ai.max_check_distance", 6.0);
@@ -51,24 +46,20 @@ public class EndermanAIUpdater extends BukkitRunnable {
         for (World world : plugin.getServer().getWorlds()) {
             for (Enderman enderman : world.getEntitiesByClass(Enderman.class)) {
 
-                // ... (Chequeos iniciales de objetivo y modo de juego como antes) ...
                 LivingEntity target = enderman.getTarget();
                 if (target == null || !(target instanceof Player) || target.isDead()) continue;
                 Player player = (Player) target;
                 if (player.getGameMode() == org.bukkit.GameMode.CREATIVE || player.getGameMode() == org.bukkit.GameMode.SPECTATOR) continue;
+                if (plugin.isIgnoreInvulnerablePlayers() && player.isInvulnerable()) continue;
 
                 Location eLoc = enderman.getLocation();
                 Location pLoc = player.getLocation();
 
-                // --- Comprobación 1: Distancia ---
                 if (eLoc.distanceSquared(pLoc) > maxCheckDistanceSq) continue;
 
-                // --- Comprobación 2: Cooldown ---
                 UUID endermanId = enderman.getUniqueId();
                 if (endermanCooldown.containsKey(endermanId) && (now - endermanCooldown.get(endermanId)) < cooldownTimeMs) continue;
 
-                // --- Comprobación 3: ¿Está Bloqueado? (Simplificada) ---
-                // Si está cerca Y NO tiene línea de visión directa -> intentar desmantelar
                 if (!enderman.hasLineOfSight(player)) {
 
                     Block obstructingBlock = findObstructingBlock(enderman, player);
@@ -77,11 +68,9 @@ public class EndermanAIUpdater extends BukkitRunnable {
                         Material blockMat = obstructingBlock.getType();
 
                         boolean isPickupable = pickupableMaterials.isEmpty() || pickupableMaterials.contains(blockMat);
-                        // Asume que isEndermanResistantBlock existe en la clase principal
                         boolean isResistant = plugin.isEndermanResistantBlock(blockMat);
 
                         if (isPickupable && !isResistant) {
-                            // --- Acción: Desmantelar y Soltar Item ---
                             plugin.getLogger().info("Enderman " + endermanId + " desmantelando y soltando bloque: " + blockMat + " en " + obstructingBlock.getLocation().toVector());
                             Material materialToDrop = obstructingBlock.getType();
                             obstructingBlock.setType(Material.AIR);
@@ -90,19 +79,17 @@ public class EndermanAIUpdater extends BukkitRunnable {
                             endermanCooldown.put(endermanId, now);
                         }
                     }
-                } // Fin if (!hasLineOfSight)
+                }
 
-            } // Fin bucle endermen
-        } // Fin bucle mundos
+            }
+        }
 
-        // Limpiar cooldown map...
         endermanCooldown.entrySet().removeIf(entry -> {
             Entity entity = plugin.getServer().getEntity(entry.getKey());
             return entity == null || entity.isDead();
         });
     }
 
-    // --- El método findObstructingBlock() permanece igual que en la versión anterior ---
     /**
      * Encuentra el primer bloque sólido, no resistente y potencialmente recogible
      * en la línea directa desde los ojos del Enderman hacia los ojos del jugador.
@@ -113,7 +100,6 @@ public class EndermanAIUpdater extends BukkitRunnable {
         Location endLoc = player.getEyeLocation();
         Vector direction = endLoc.toVector().subtract(startLoc.toVector()).normalize();
         World world = enderman.getWorld();
-        // Re-calculamos aquí el límite efectivo basado en la variable miembro maxCheckDistanceSq
         double effectiveMaxDist = Math.min(maxCheckDistanceSq > 0 ? Math.sqrt(maxCheckDistanceSq) : 6.0, 5.0);
 
         for (double d = 0.8; d < effectiveMaxDist; d += 0.4) {
@@ -123,7 +109,6 @@ public class EndermanAIUpdater extends BukkitRunnable {
 
             if (blockMat.isSolid()) {
                 boolean isPickupable = pickupableMaterials.isEmpty() || pickupableMaterials.contains(blockMat);
-                // Asume que isEndermanResistantBlock existe en la clase principal
                 boolean isResistant = plugin.isEndermanResistantBlock(blockMat);
 
                 if (isPickupable && !isResistant) {
@@ -136,4 +121,4 @@ public class EndermanAIUpdater extends BukkitRunnable {
         return null; // No se encontró obstáculo sólido
     }
 
-} // Fin de la clase
+}
