@@ -6,7 +6,7 @@ version: 1.2.1 # 1.2.0 del autor original + port a Paper 26.1.2
 
 main: com.krystalfox.aimobs.AdvancedMobAI
 
-api-version: '26.1.2'
+api-version: '26.1'
 
 authors: [Diamondxv0, ll33ee]
 description: Mejora la inteligencia artificial de varios mobs hostiles en Minecraft.
